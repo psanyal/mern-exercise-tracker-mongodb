@@ -8,6 +8,7 @@ export default class CreateExercise extends Component {
     super(props);
 
     this.onChangeUsername = this.onChangeUsername.bind(this);
+    this.onChangeType = this.onChangeType.bind(this);
     this.onChangeDescription = this.onChangeDescription.bind(this);
     this.onChangeDuration = this.onChangeDuration.bind(this);
     this.onChangeDate = this.onChangeDate.bind(this);
@@ -15,10 +16,12 @@ export default class CreateExercise extends Component {
 
     this.state = {
       username: '',
+      type: '',
       description: '',
       duration: 0,
       date: new Date(),
-      users: []
+      users: [],
+      types: []
     }
   }
 
@@ -36,11 +39,30 @@ export default class CreateExercise extends Component {
         console.log(error);
       })
 
+      axios.get('http://localhost:5000/exerciseType/')
+      .then(response => {
+        if (response.data.length > 0) {
+          this.setState({
+            types: response.data.map(type => type.type),
+            type: response.data[0].type
+          })
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+
   }
 
   onChangeUsername(e) {
     this.setState({
       username: e.target.value
+    })
+  }
+
+  onChangeType(e) {
+    this.setState({
+      type: e.target.value
     })
   }
 
@@ -67,6 +89,7 @@ export default class CreateExercise extends Component {
 
     const exercise = {
       username: this.state.username,
+      type: this.state.type,
       description: this.state.description,
       duration: this.state.duration,
       date: this.state.date
@@ -97,6 +120,23 @@ export default class CreateExercise extends Component {
                   return <option 
                     key={user}
                     value={user}>{user}
+                    </option>;
+                })
+              }
+          </select>
+        </div>
+        <div className="form-group"> 
+          <label>Exercise Type: </label>
+          <select ref="userInput"
+              required
+              className="form-control"
+              value={this.state.type}
+              onChange={this.onChangeType}>
+              {
+                this.state.types.map(function(type) {
+                  return <option 
+                    key={type}
+                    value={type}>{type}
                     </option>;
                 })
               }

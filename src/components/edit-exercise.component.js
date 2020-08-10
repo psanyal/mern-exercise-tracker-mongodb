@@ -8,6 +8,7 @@ export default class EditExercise extends Component {
     super(props);
 
     this.onChangeUsername = this.onChangeUsername.bind(this);
+    this.onChangeType = this.onChangeType.bind(this);
     this.onChangeDescription = this.onChangeDescription.bind(this);
     this.onChangeDuration = this.onChangeDuration.bind(this);
     this.onChangeDate = this.onChangeDate.bind(this);
@@ -15,10 +16,12 @@ export default class EditExercise extends Component {
 
     this.state = {
       username: '',
+      type: '',
       description: '',
       duration: 0,
       date: new Date(),
-      users: []
+      users: [],
+      exerciseTypes: [],
     }
   }
 
@@ -27,6 +30,7 @@ export default class EditExercise extends Component {
       .then(response => {
         this.setState({
           username: response.data.username,
+          type: response.data.type,
           description: response.data.description,
           duration: response.data.duration,
           date: new Date(response.data.date)
@@ -48,11 +52,29 @@ export default class EditExercise extends Component {
         console.log(error);
       })
 
+    axios.get('http://localhost:5000/exerciseType/')
+      .then(response => {
+        if (response.data.length > 0) {
+          this.setState({
+            exerciseTypes: response.data.map(e => e.type),
+          })
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+
   }
 
   onChangeUsername(e) {
     this.setState({
       username: e.target.value
+    })
+  }
+
+  onChangeType(e) {
+    this.setState({
+      type: e.target.value
     })
   }
 
@@ -79,6 +101,7 @@ export default class EditExercise extends Component {
 
     const exercise = {
       username: this.state.username,
+      type: this.state.type,
       description: this.state.description,
       duration: this.state.duration,
       date: this.state.date
@@ -109,6 +132,23 @@ export default class EditExercise extends Component {
                   return <option 
                     key={user}
                     value={user}>{user}
+                    </option>;
+                })
+              }
+          </select>
+        </div>
+        <div className="form-group"> 
+          <label>Exercise Type: </label>
+          <select ref="exerciseType"
+              required
+              className="form-control"
+              value={this.state.type}
+              onChange={this.onChangeType}>
+              {
+                this.state.exerciseTypes.map(function(et) {
+                  return <option 
+                    key={et}
+                    value={et}>{et}
                     </option>;
                 })
               }
